@@ -73,6 +73,7 @@ class Payment(db.Model):
 class Event(db.Model):
     """Events table"""
     __tablename__ = 'events'
+    __table_args__ = {'quote': True} 
     
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     creator_tenant_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tenants.id'), nullable=False)
