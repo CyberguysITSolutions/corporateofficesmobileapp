@@ -89,7 +89,7 @@ def register():
     db.session.commit()
     
     # Generate access token
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     
     return jsonify({
         'message': 'User registered successfully',
@@ -114,7 +114,7 @@ def login():
     if not user or not check_password_hash(user.password_hash, data['password']):
         return jsonify({'error': 'Invalid email or password'}), 401
     
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     
     return jsonify({
         'access_token': access_token,
@@ -130,7 +130,8 @@ def login():
 def get_profile():
     """Get current user profile"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    from uuid import UUID
+    user = User.query.get(UUID(current_user_id) if isinstance(current_user_id, str) else current_user_id)
     
     if not user:
         return jsonify({'error': 'User not found'}), 404
