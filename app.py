@@ -45,7 +45,7 @@ def role_required(roles):
         @jwt_required()
         def wrapper(*args, **kwargs):
             current_user_id = get_jwt_identity()
-            user = User.query.get(current_user_id)
+            user = User.query.get(int(current_user_id))
             if not user or user.role not in roles:
                 return jsonify({'error': 'Unauthorized access'}), 403
             return fn(*args, **kwargs)
@@ -130,8 +130,7 @@ def login():
 def get_profile():
     """Get current user profile"""
     current_user_id = get_jwt_identity()
-    from uuid import UUID
-    user = User.query.get(UUID(current_user_id) if isinstance(current_user_id, str) else current_user_id)
+    user = User.query.get(int(current_user_id))
     
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -156,7 +155,7 @@ def get_profile():
 def update_profile():
     """Update user profile"""
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     data = request.get_json()
     
     if not user:
@@ -183,7 +182,7 @@ def update_profile():
 def get_payments():
     """Get payment history for current tenant"""
     current_user_id = get_jwt_identity()
-    tenant = Tenant.query.filter_by(user_id=current_user_id).first()
+    tenant = Tenant.query.filter_by(user_id=int(current_user_id)).first()
     
     if not tenant:
         return jsonify({'error': 'Tenant not found'}), 404
@@ -205,7 +204,7 @@ def get_payments():
 def initiate_payment():
     """Initiate a new payment with Stripe"""
     current_user_id = get_jwt_identity()
-    tenant = Tenant.query.filter_by(user_id=current_user_id).first()
+    tenant = Tenant.query.filter_by(user_id=int(current_user_id)).first()
     data = request.get_json()
     
     if not tenant:
@@ -221,7 +220,7 @@ def initiate_payment():
             amount=int(float(amount) * 100),  # Convert to cents
             currency='usd',
             metadata={
-                'tenant_id': tenant.id,
+                'tenant_id': str(tenant.id),
                 'business_name': tenant.business_name
             }
         )
@@ -305,7 +304,7 @@ def get_events():
 def create_event():
     """Create a new event"""
     current_user_id = get_jwt_identity()
-    tenant = Tenant.query.filter_by(user_id=current_user_id).first()
+    tenant = Tenant.query.filter_by(user_id=int(current_user_id)).first()
     data = request.get_json()
     
     if not tenant:
