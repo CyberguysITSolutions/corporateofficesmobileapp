@@ -60,8 +60,8 @@ class Payment(db.Model):
     """Payment transactions table"""
     __tablename__ = 'payments'
     
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    tenant_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tenants.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)  # ✓ Changed to Integer
+    tenant_id = db.Column(db.Integer, db.ForeignKey('tenants.id'), nullable=False)  # ✓ Changed to Integer
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     due_date = db.Column(db.Date, nullable=False, index=True)
     paid_date = db.Column(db.DateTime)
